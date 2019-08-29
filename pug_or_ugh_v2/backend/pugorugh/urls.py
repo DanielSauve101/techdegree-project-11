@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
@@ -12,6 +12,8 @@ from pugorugh import views
 urlpatterns = format_suffix_patterns([
     path('api/user/login/', obtain_auth_token, name='login-user'),
     path('api/user/', views.UserRegisterView.as_view(), name='register-user'),
+    path('api/user/preferences/', views.RetrieveUpdateDestroyUserPref.as_view(), name=('user-pref')),
+    path('api/dog/', views.ListDog.as_view(), name=('dog-list')),
     path('favicon\.ico',
         RedirectView.as_view(
             url='/static/icons/favicon.ico',

@@ -36,6 +36,13 @@ class DogSerializer(serializers.ModelSerializer):
 
 class UserPrefSerializer(serializers.ModelSerializer):
     class Meta:
+        AGE_OPTION = [
+            ('b', 'baby'),
+            ('y', 'young'),
+            ('a', 'adult'),
+            ('s', 'senior'),
+        ]
+        # age = serializers.MultipleChoiceField(choices=AGE_OPTION) This was a try and fail.
         fields = (
             'age',
             'gender',

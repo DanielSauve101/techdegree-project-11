@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import generics, mixins, permissions, viewsets
 from rest_framework.generics import CreateAPIView
 
 from . import models
@@ -13,10 +14,18 @@ class UserRegisterView(CreateAPIView):
     serializer_class = serializers.UserSerializer
 
 
-class DogViewSet(mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    viewsets.GenericViewSet):
+class ListDog(generics.ListAPIView):
     queryset = models.Dog.objects.all()
     serializer_class = serializers.DogSerializer
+
+
+class RetrieveUpdateDestroyUserPref(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.UserPref.objects.all()
+    serializer_class = serializers.UserPrefSerializer
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, user=self.request.user)
+        print(obj.age)
+        return obj
+

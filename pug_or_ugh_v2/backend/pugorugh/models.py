@@ -32,7 +32,7 @@ STATUS_OPTION = (
 class Dog(models.Model):
     name = models.CharField(max_length=100)
     image_filename = models.TextField()
-    breed = models.CharField(max_length=100)
+    breed = models.CharField(max_length=100, default='unknown')
     age = models.PositiveIntegerField()
     gender = MultiSelectField(max_length=1, choices=GENDER_OPTION, default='u')
     size = MultiSelectField(max_length=2, choices=SIZE_OPTION, default='u')
@@ -63,6 +63,6 @@ class UserPref(models.Model):
     size = MultiSelectField(choices=SIZE_OPTION, max_choices=5)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
