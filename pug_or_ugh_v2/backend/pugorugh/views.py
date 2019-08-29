@@ -7,7 +7,6 @@ from . import models
 from . import serializers
 
 
-
 class UserRegisterView(CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     model = get_user_model()
