@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
-from rest_framework import generics, mixins, permissions, viewsets
+from rest_framework import authentication, generics, mixins, permissions, viewsets
 from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
 
 from . import models
 from . import serializers
@@ -20,12 +21,12 @@ class ListDog(generics.ListAPIView):
 
 
 class RetrieveUpdateDestroyUserPref(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = models.UserPref.objects.all()
     serializer_class = serializers.UserPrefSerializer
     
     def get_object(self):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, user=self.request.user)
-        print(obj.age)
         return obj
 
