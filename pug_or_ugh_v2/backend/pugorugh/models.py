@@ -56,12 +56,12 @@ class UserPref(models.Model):
 
 class UserDog(models.Model):
     user = models.ForeignKey(
-        UserPref,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
     dog = models.ForeignKey(Dog, on_delete=models.CASCADE)
     status = MultiSelectField(max_length=1, choices=STATUS_OPTION)
 
     def __str__(self):
-        return self.user
+        return self.dog.name
 

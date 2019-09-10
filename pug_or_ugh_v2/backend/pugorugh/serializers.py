@@ -50,10 +50,12 @@ class UserPrefSerializer(serializers.ModelSerializer):
 
 
 class UserDogSerializer(serializers.ModelSerializer):
+    status = serializers.MultipleChoiceField(choices=models.STATUS_OPTION)
     class Meta:
         fields = (
+            'id',
             'user',
             'dog',
             'status'
         )
-        models = models.UserDog
+        model = models.UserDog

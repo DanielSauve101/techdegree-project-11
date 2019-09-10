@@ -12,6 +12,24 @@ from . import models
 from . import serializers
 
 
+def preferred_dog_age(preferred_age):
+    age_groups = []
+    b = [b for b in range(1, 13)]
+    y = [y for y in range(13, 31)]
+    a = [a for a in range(31, 121)]
+    s = [s for s in range(121, 240)]
+
+    if 'b' in preferred_age:
+        age_groups.extend(b)
+    if 'y' in preferred_age:
+        age_groups.extend(y)
+    if 'a' in preferred_age:
+        age_groups.extend(a)
+    if 's' in preferred_age:
+        age_groups.extend(s)
+
+    return age_groups
+
 class UserRegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     model = get_user_model()
@@ -32,17 +50,66 @@ class RetrieveDog(generics.RetrieveAPIView):
         return queryset
 
     def get_object(self):
-        queryset = self.get_queryset()
-        if len(queryset) == 0:
-            raise Http404()
-        else:
-            object = queryset.first()
+        decision = self.kwargs.get('decision')
+        preference = models.UserPref.objects.get(
+            user=self.request.user)
+
+        if decision == 'undecided':
+            queryset = self.get_queryset().filter(
+                age__in=preferred_dog_age(preference.age),
+                gender__in=preference.gender,
+                size__in=preference.size,
+                userdog__isnull=True
+            )
+            if len(queryset) == 0:
+                raise Http404()
+            else:
+                object = queryset.first()
+            return object
+        elif decision == 'liked':
+            queryset = self.get_queryset().filter(
+                userdog__status='l'
+            )
+            if len(queryset) == 0:
+                raise Http404()
+            else:
+                object = queryset.first()
+            return object
+        elif decision == 'disliked':
+            queryset = self.get_queryset().filter(
+                userdog__status='d'
+            )
+            if len(queryset) == 0:
+                raise Http404()
+            else:
+                object = queryset.first()
             return object
 
 
 class UpdateDogStatus(generics.UpdateAPIView):
     queryset = models.UserDog.objects.all()
     serializer_class = serializers.UserDogSerializer
+
+    def get_object(self):
+        dog = models.Dog.objects.get(pk=self.kwargs.get('pk'))
+        status = self.kwargs.get('decision')
+
+        if status == 'liked':
+            status = 'l'
+        else: 
+            status = 'd'
+
+        try:
+            obj = self.get_queryset().get(
+                user=self.request.user,
+                dog=dog)
+            print(obj)
+        except ObjectDoesNotExist:
+            obj = self.get_queryset().create(
+                user=self.request.user,
+                dog=dog,
+                status=status)
+        return obj
 
 
 class RetrieveUpdateUserPref(generics.RetrieveUpdateAPIView, mixins.CreateModelMixin):
