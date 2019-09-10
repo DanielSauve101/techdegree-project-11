@@ -15,7 +15,7 @@ var Dog = React.createClass({
   },
   getNext: function () {
     this.serverRequest = $.ajax({
-      url: `api/dog/${ this.state.details ? this.state.details.id : -1 }/${ this.state.filter }/next/`,
+      url: `api/dog/${ this.state.details ? this.state.details.id : 0 }/${ this.state.filter }/next/`,
       method: "GET",
       dataType: "json",
       headers: TokenAuth.getAuthHeader()

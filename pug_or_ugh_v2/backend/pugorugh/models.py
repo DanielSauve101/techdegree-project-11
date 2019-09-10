@@ -41,9 +41,22 @@ class Dog(models.Model):
         return self.name
 
 
-class UserDog(models.Model):
+class UserPref(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    age = MultiSelectField(choices=AGE_OPTION, max_choices=4, default='b,y,a,s')
+    gender = MultiSelectField(choices=GENDER_OPTION, max_choices=3, default='m,f')
+    size = MultiSelectField(choices=SIZE_OPTION, max_choices=5, default='s,m')
+
+    def __str__(self):
+        return self.user.username
+
+
+class UserDog(models.Model):
+    user = models.ForeignKey(
+        UserPref,
         on_delete=models.CASCADE,
     )
     dog = models.ForeignKey(Dog, on_delete=models.CASCADE)
@@ -51,18 +64,4 @@ class UserDog(models.Model):
 
     def __str__(self):
         return self.user
-
-
-class UserPref(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    age = MultiSelectField(choices=AGE_OPTION, max_choices=4)
-    gender = MultiSelectField(choices=GENDER_OPTION, max_choices=3)
-    size = MultiSelectField(choices=SIZE_OPTION, max_choices=5)
-
-    def __str__(self):
-        return self.user.username
-
 

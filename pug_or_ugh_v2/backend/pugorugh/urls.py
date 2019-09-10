@@ -12,8 +12,10 @@ from pugorugh import views
 urlpatterns = format_suffix_patterns([
     path('api/user/login/', obtain_auth_token, name='login-user'),
     path('api/user/', views.UserRegisterView.as_view(), name='register-user'),
-    path('api/user/preferences/', views.RetrieveUpdateDestroyUserPref.as_view(), name=('user-pref')),
+    path('api/user/preferences/', views.RetrieveUpdateUserPref.as_view(), name=('user-pref')),
     path('api/dog/', views.ListDog.as_view(), name=('dog-list')),
+    path('api/dog/<int:pk>/<str:decision>/next/', views.RetrieveDog.as_view(), name=('dog-decision')),
+    path('api/dog/<int:pk>/<str:decision>/', views.UpdateDogStatus.as_view(), name=('dog-status')),
     path('favicon\.ico',
         RedirectView.as_view(
             url='/static/icons/favicon.ico',

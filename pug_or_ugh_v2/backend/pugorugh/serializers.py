@@ -24,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 class DogSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
+            'id',
             'name',
             'image_filename',
             'breed',
@@ -40,8 +41,19 @@ class UserPrefSerializer(serializers.ModelSerializer):
     size = serializers.MultipleChoiceField(choices=models.SIZE_OPTION)
     class Meta:
         fields = (
+            'id',
             'age',
             'gender',
             'size'
         )
         model = models.UserPref
+
+
+class UserDogSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'user',
+            'dog',
+            'status'
+        )
+        models = models.UserDog
