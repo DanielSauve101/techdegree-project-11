@@ -16,10 +16,6 @@ urlpatterns = format_suffix_patterns([
     path('api/dog/', views.ListDog.as_view(), name=('dog-list')),
     path('api/dog/<int:pk>/<str:decision>/next/', views.RetrieveDog.as_view(), name=('dog-decision')),
     path('api/dog/<int:pk>/<str:decision>/', views.UpdateDogStatus.as_view(), name=('dog-status')),
-    path('favicon\.ico',
-        RedirectView.as_view(
-            url='/static/icons/favicon.ico',
-            permanent=True
-        )),
+    path('favicon\.ico', RedirectView.as_view(url='/static/icons/favicon.ico', permanent=True)),
     path('', TemplateView.as_view(template_name='index.html'))
 ])

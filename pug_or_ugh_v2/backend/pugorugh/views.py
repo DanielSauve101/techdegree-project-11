@@ -64,7 +64,8 @@ class RetrieveDog(generics.RetrieveAPIView):
             if len(queryset) == 0:
                 raise Http404()
             else:
-                object = queryset.first()
+                object = queryset[0]
+                print("The pk in the url section should be {}".format(object.id))
             return object
         elif decision == 'liked':
             queryset = self.get_queryset().filter(
@@ -91,7 +92,7 @@ class UpdateDogStatus(generics.UpdateAPIView):
     serializer_class = serializers.UserDogSerializer
 
     def get_object(self):
-        dog = models.Dog.objects.get(pk=self.kwargs.get('pk'))
+        dog = models.Dog.objects.get(id=self.kwargs.get('pk'))
         status = self.kwargs.get('decision')
 
         if status == 'liked':
@@ -103,7 +104,7 @@ class UpdateDogStatus(generics.UpdateAPIView):
             obj = self.get_queryset().get(
                 user=self.request.user,
                 dog=dog)
-            print(obj)
+            print(obj.id)
         except ObjectDoesNotExist:
             obj = self.get_queryset().create(
                 user=self.request.user,
