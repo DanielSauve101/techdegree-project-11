@@ -11,6 +11,14 @@ from rest_framework.response import Response
 from . import models
 from . import serializers
 
+def retrieve_single_dog(dogs, pk):
+    try:
+        dog = dogs.filter(id__gt=pk)[:1].get()
+        print("Dog id is {}. This pk should be in the url.".format(dog.id))
+    except ObjectDoesNotExist:
+        dog = dogs.first()
+        print("List has looped")
+    return dog
 
 def preferred_dog_age(preferred_age):
     age_groups = []
@@ -65,31 +73,20 @@ class RetrieveDog(generics.RetrieveAPIView):
             dogs = queryset.filter(
                 userdog__isnull=True
             )
-            try:
-                dog = dogs.filter(id__gt=pk)[:1].get()
-                print("Dog id is {}. This pk should be in the url.".format(dog.id))
-            except ObjectDoesNotExist:
-                dog = dogs.first()
-                print("List has looped")
+            dog = retrieve_single_dog(dogs, pk)
             return dog
         elif decision == 'liked':
-            queryset = self.get_queryset().filter(
+            dogs = queryset.filter(
                 userdog__status='l'
             )
-            if len(queryset) == 0:
-                raise Http404()
-            else:
-                object = queryset.first()
-            return object
+            dog = retrieve_single_dog(dogs, pk)
+            return dog
         elif decision == 'disliked':
-            queryset = self.get_queryset().filter(
+            dogs = queryset.filter(
                 userdog__status='d'
             )
-            if len(queryset) == 0:
-                raise Http404()
-            else:
-                object = queryset.first()
-            return object
+            dog = retrieve_single_dog(dogs, pk)
+            return dog
 
 
 class UpdateDogStatus(generics.UpdateAPIView):
