@@ -46,27 +46,32 @@ class RetrieveDog(generics.RetrieveAPIView):
     serializer_class = serializers.DogSerializer
 
     def get_queryset(self):
-        queryset = self.queryset.filter(id__gt=self.kwargs.get('pk'))
+        preference = models.UserPref.objects.get(
+            user=self.request.user)
+
+        queryset = self.queryset.filter(
+            age__in=preferred_dog_age(preference.age),
+            gender__in=preference.gender,
+            size__in=preference.size
+        )
         return queryset
 
     def get_object(self):
         decision = self.kwargs.get('decision')
-        preference = models.UserPref.objects.get(
-            user=self.request.user)
+        pk = self.kwargs.get('pk')
+        queryset = self.get_queryset()
 
         if decision == 'undecided':
-            queryset = self.get_queryset().filter(
-                age__in=preferred_dog_age(preference.age),
-                gender__in=preference.gender,
-                size__in=preference.size,
+            dogs = queryset.filter(
                 userdog__isnull=True
             )
-            if len(queryset) == 0:
-                raise Http404()
-            else:
-                object = queryset[0]
-                print("The pk in the url section should be {}".format(object.id))
-            return object
+            try:
+                dog = dogs.filter(id__gt=pk)[:1].get()
+                print("Dog id is {}. This pk should be in the url.".format(dog.id))
+            except ObjectDoesNotExist:
+                dog = dogs.first()
+                print("List has looped")
+            return dog
         elif decision == 'liked':
             queryset = self.get_queryset().filter(
                 userdog__status='l'
