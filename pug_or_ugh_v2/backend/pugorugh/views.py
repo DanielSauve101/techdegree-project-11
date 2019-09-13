@@ -52,43 +52,36 @@ class RetrieveDogView(generics.RetrieveAPIView):
     serializer_class = DogSerializer
 
     def get_queryset(self):
+        decision = self.kwargs.get('decision')
+
         preference = UserPref.objects.get(
             user=self.request.user)
+
+        user_dog_queryset = UserDog.objects.filter(user=self.request.user)
 
         queryset = self.queryset.filter(
             age__in=preferred_dog_age(preference.age),
             gender__in=preference.gender,
             size__in=preference.size,
         )
-        return queryset
+
+        if decision == 'liked' or decision == 'disliked':
+            dogs = queryset.filter(
+                userdog__in=user_dog_queryset,
+                userdog__status=decision[0]
+            )
+        else:
+            dogs = queryset.filter(
+                ~Q(userdog__in=user_dog_queryset) | Q(userdog__status=decision[0])
+            )
+        
+        return dogs
 
     def get_object(self):
-        decision = self.kwargs.get('decision')
         pk = self.kwargs.get('pk')
         queryset = self.get_queryset()
-
-        if decision == 'undecided':
-            print(queryset)
-            dogs = queryset.filter(
-                Q(userdog__isnull=True) | Q(userdog__status='u') & Q(userdog__user=self.request.user)
-            )
-            print(dogs)
-            dog = retrieve_single_dog(dogs, pk)
-            return dog
-        elif decision == 'liked':
-            dogs = queryset.filter(
-                userdog__user=self.request.user,
-                userdog__status='l'
-            )
-            dog = retrieve_single_dog(dogs, pk)
-            return dog
-        elif decision == 'disliked':
-            dogs = queryset.filter(
-                userdog__user=self.request.user,
-                userdog__status='d'
-            )
-            dog = retrieve_single_dog(dogs, pk)
-            return dog
+        dog = retrieve_single_dog(queryset, pk)
+        return dog
 
 
 class UpdateDogStatusView(generics.UpdateAPIView):
