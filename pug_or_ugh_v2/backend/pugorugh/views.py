@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.db.models import Q
+from django.db.models import Q, When
 
 from rest_framework import (authentication, generics, 
                             mixins, permissions)
@@ -58,7 +58,7 @@ class RetrieveDogView(generics.RetrieveAPIView):
         queryset = self.queryset.filter(
             age__in=preferred_dog_age(preference.age),
             gender__in=preference.gender,
-            size__in=preference.size
+            size__in=preference.size,
         )
         return queryset
 
@@ -68,19 +68,23 @@ class RetrieveDogView(generics.RetrieveAPIView):
         queryset = self.get_queryset()
 
         if decision == 'undecided':
+            print(queryset)
             dogs = queryset.filter(
-                Q(userdog__isnull=True) | Q(userdog__status='u')
+                Q(userdog__isnull=True) | Q(userdog__status='u') & Q(userdog__user=self.request.user)
             )
+            print(dogs)
             dog = retrieve_single_dog(dogs, pk)
             return dog
         elif decision == 'liked':
             dogs = queryset.filter(
+                userdog__user=self.request.user,
                 userdog__status='l'
             )
             dog = retrieve_single_dog(dogs, pk)
             return dog
         elif decision == 'disliked':
             dogs = queryset.filter(
+                userdog__user=self.request.user,
                 userdog__status='d'
             )
             dog = retrieve_single_dog(dogs, pk)
@@ -123,5 +127,22 @@ class RetrieveUpdateUserPrefView(generics.RetrieveUpdateAPIView):
             obj = queryset.get(user=self.request.user)
         except ObjectDoesNotExist:
             obj = queryset.create(user=self.request.user)
+
         return obj
+
+    def put(self, request, *args, **kwargs):
+        obj = UserPref.objects.get(user=self.request.user)
+
+        if request.method == 'PUT':
+            obj.age = request.data.get('age')
+            obj.gender = request.data.get('gender')
+            obj.size = request.data.get('size')
+
+            obj.save()
+
+            serializer = UserPrefSerializer(obj)
+
+        return Response(serializer.data)
+
+
 

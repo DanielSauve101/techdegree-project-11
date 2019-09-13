@@ -49,7 +49,7 @@ class UserPref(models.Model):
     )
     age = MultiSelectField(choices=AGE_OPTION, max_choices=4, default='b,y,a,s')
     gender = MultiSelectField(choices=GENDER_OPTION, max_choices=3, default='m,f')
-    size = MultiSelectField(choices=SIZE_OPTION, max_choices=5, default='s,m')
+    size = MultiSelectField(choices=SIZE_OPTION, max_choices=5, default='s,m,l')
 
     def __str__(self):
         return self.user.username
