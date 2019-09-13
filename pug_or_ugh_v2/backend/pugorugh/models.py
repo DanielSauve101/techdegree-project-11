@@ -27,6 +27,7 @@ SIZE_OPTION = (
 STATUS_OPTION = (
     ('l', 'liked'),
     ('d', 'disliked'),
+    ('u', 'unknown'),
 )
 
 class Dog(models.Model):
