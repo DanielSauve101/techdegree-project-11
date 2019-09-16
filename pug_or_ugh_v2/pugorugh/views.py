@@ -41,11 +41,6 @@ class UserRegisterView(generics.CreateAPIView):
     model = get_user_model()
     serializer_class = UserSerializer
 
-
-class ListDogView(generics.ListAPIView):
-    queryset = Dog.objects.all()
-    serializer_class = DogSerializer
-
     
 class RetrieveDogView(generics.RetrieveAPIView):
     queryset = Dog.objects.all()
