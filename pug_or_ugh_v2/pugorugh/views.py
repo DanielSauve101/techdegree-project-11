@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.db.models import Q, When
+from django.db.models import Q
 
 from rest_framework import (authentication, generics, 
                             mixins, permissions)
@@ -72,7 +72,7 @@ class RetrieveDogView(generics.RetrieveAPIView):
             )
         else:
             dogs = queryset.filter(
-                ~Q(userdog__in=user_dog_queryset) | Q(userdog__status=decision[0])
+                ~Q(userdog__in=user_dog_queryset) | Q(userdog__status='u')
             )
         
         return dogs
