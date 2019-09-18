@@ -76,6 +76,10 @@ class RetrieveDogView(generics.RetrieveAPIView):
         pk = self.kwargs.get('pk')
         queryset = self.get_queryset()
         dog = retrieve_single_dog(queryset, pk)
+
+        if not dog:
+            raise Http404
+
         return dog
 
 
