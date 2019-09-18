@@ -12,6 +12,7 @@ from pugorugh.serializers import (DogSerializer, UserSerializer,
                                   UserPrefSerializer, UserDogSerializer)
 
 def retrieve_single_dog(dogs, pk):
+    """Retrieve single dog and loop back when user went through all dogs."""
     try:
         dog = dogs.filter(id__gt=pk)[:1].get()
     except ObjectDoesNotExist:
@@ -19,6 +20,7 @@ def retrieve_single_dog(dogs, pk):
     return dog
 
 def preferred_dog_age(preferred_age):
+    """Function that converts dog ages(Integer) into strings depending on age."""
     age_groups = []
     b = [b for b in range(1, 13)]
     y = [y for y in range(13, 31)]
